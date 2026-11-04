@@ -90,6 +90,19 @@ public class FolderSynchronizerTests : IDisposable
     }
 
     [Fact]
+    public void Sync_UpdatesFileWhenSizeChanged()
+    {
+        CreateFile(_source, "a.txt", "version 1");
+        _synchronizer.Sync();
+
+        CreateFile(_source, "a.txt", "version 2 is longer");
+        _synchronizer.Sync();
+
+        AssertReplicaMatchesSource();
+        Assert.Contains("Updated file", File.ReadAllText(_logPath));
+    }
+    
+    [Fact]
     public void Sync_SourceDoesNotExist_Throws()
     {
         Directory.Delete(_source);

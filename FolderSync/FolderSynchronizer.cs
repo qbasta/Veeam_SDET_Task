@@ -55,6 +55,11 @@ public class FolderSynchronizer
                 File.Copy(sourceFile, replicaFile);
                 _logger.Log($"Copied file: {sourceFile} -> {replicaFile}");
             }
+            else if (new FileInfo(sourceFile).Length != new FileInfo(replicaFile).Length)
+            {
+                File.Copy(sourceFile, replicaFile, true);
+                _logger.Log($"Updated file: {sourceFile} -> {replicaFile}");
+            }
         }
     }
 
