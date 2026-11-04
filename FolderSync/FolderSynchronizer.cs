@@ -31,6 +31,8 @@ public class FolderSynchronizer
 
     private void SyncFolder(string sourceDir, string replicaDir)
     {
+        RemoveMissingItems(sourceDir, replicaDir);
+
         foreach (string sourceSubDir in Directory.GetDirectories(sourceDir))
         {
             string replicaSubDir = Path.Combine(replicaDir, Path.GetFileName(sourceSubDir));
@@ -55,4 +57,49 @@ public class FolderSynchronizer
             }
         }
     }
+
+    // Deletes everything from the replica folder that is not in the source folder
+    private void RemoveMissingItems(string sourceDir, string replicaDir)
+    {
+        foreach (string replicaFile in Directory.GetFiles(replicaDir))
+        {
+            string sourceFile = Path.Combine(sourceDir, Path.GetFileName(replicaFile));
+            if (!File.Exists(sourceFile))
+            {
+                DeleteFile(replicaFile);
+            }
+        }
+
+        foreach (string replicaSubDir in Directory.GetDirectories(replicaDir))
+        {
+            string sourceSubDir = Path.Combine(sourceDir, Path.GetFileName(replicaSubDir));
+            if (!Directory.Exists(sourceSubDir))
+            {
+                DeleteDirectory(replicaSubDir);
+            }
+        }
+    }
+
+    private void DeleteFile(string path)
+    {
+        File.Delete(path);
+        _logger.Log($"Deleted file: {path}");
+    }
+
+    private void DeleteDirectory(string path)
+    {
+        // files and subfolders are removed one by one so that each of them is logged
+        foreach (string file in Directory.GetFiles(path))
+        {
+            DeleteFile(file);
+        }
+
+        foreach (string subDir in Directory.GetDirectories(path))
+        {
+            DeleteDirectory(subDir);
+        }
+
+        Directory.Delete(path);
+        _logger.Log($"Deleted directory: {path}");
+    } 
 }

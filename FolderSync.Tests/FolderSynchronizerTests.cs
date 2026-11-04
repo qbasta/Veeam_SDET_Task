@@ -96,4 +96,42 @@ public class FolderSynchronizerTests : IDisposable
 
         Assert.Throws<DirectoryNotFoundException>(() => _synchronizer.Sync());
     }
+    
+    [Fact]
+    public void Sync_RemovesFilesMissingInSource()
+    {
+        CreateFile(_source, "keep.txt", "keep");
+        CreateFile(_replica, "keep.txt", "keep");
+        CreateFile(_replica, "extra.txt", "extra");
+
+        _synchronizer.Sync();
+
+        AssertReplicaMatchesSource();
+    }
+
+    [Fact]
+    public void Sync_RemovesFoldersMissingInSource()
+    {
+        CreateFile(_source, "a.txt", "a");
+        CreateFile(_replica, Path.Combine("old", "deep", "f.txt"), "old");
+
+        _synchronizer.Sync();
+
+        AssertReplicaMatchesSource();
+        Assert.False(Directory.Exists(Path.Combine(_replica, "old")));
+    }
+
+    [Fact]
+    public void Sync_RemovesFileThatWasDeletedFromSource()
+    {
+        CreateFile(_source, "a.txt", "a");
+        CreateFile(_source, "b.txt", "b");
+        _synchronizer.Sync();
+
+        File.Delete(Path.Combine(_source, "b.txt"));
+        _synchronizer.Sync();
+
+        AssertReplicaMatchesSource();
+        Assert.Contains("Deleted file", File.ReadAllText(_logPath));
+    }
 }
