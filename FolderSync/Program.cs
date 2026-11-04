@@ -12,8 +12,8 @@ catch (ArgumentException ex)
     return 1;
 }
 
-Console.WriteLine($"Source: {options.SourcePath}");
-Console.WriteLine($"Replica: {options.ReplicaPath}");
-Console.WriteLine($"Interval: {options.IntervalSeconds}s");
-Console.WriteLine($"Log file: {options.LogPath}");
+var logger = new Logger(options.LogPath);
+logger.Log($"Source: {options.SourcePath}");
+logger.Log($"Replica: {options.ReplicaPath}");
+logger.Log($"Interval: {options.IntervalSeconds}s");
 return 0;
