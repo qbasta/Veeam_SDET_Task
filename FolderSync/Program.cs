@@ -16,4 +16,7 @@ var logger = new Logger(options.LogPath);
 logger.Log($"Source: {options.SourcePath}");
 logger.Log($"Replica: {options.ReplicaPath}");
 logger.Log($"Interval: {options.IntervalSeconds}s");
+
+var synchronizer = new FolderSynchronizer(options.SourcePath, options.ReplicaPath, logger);
+synchronizer.Sync();
 return 0;
