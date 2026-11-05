@@ -30,4 +30,36 @@ public class SyncOptionsTests
     {
         Assert.Throws<ArgumentException>(() => SyncOptions.Parse(new[] { "src", "replica", interval, "sync.log" }));
     }
+    
+    [Fact]
+    public void Parse_ReplicaInsideSource_Throws()
+    {
+        Assert.Throws<ArgumentException>(() => SyncOptions.Parse(new[] { "data", Path.Combine("data", "replica"), "10", "sync.log" }));
+    }
+
+    [Fact]
+    public void Parse_SourceInsideReplica_Throws()
+    {
+        Assert.Throws<ArgumentException>(() => SyncOptions.Parse(new[] { Path.Combine("backup", "data"), "backup", "10", "sync.log" }));
+    }
+
+    [Fact]
+    public void Parse_SameSourceAndReplica_Throws()
+    {
+        Assert.Throws<ArgumentException>(() => SyncOptions.Parse(new[] { "data", "data", "10", "sync.log" }));
+    }
+
+    [Fact]
+    public void Parse_FoldersWithSimilarNames_AreAllowed()
+    {
+        var options = SyncOptions.Parse(new[] { "data", "data-backup", "10", "sync.log" });
+
+        Assert.Equal(Path.GetFullPath("data-backup"), options.ReplicaPath);
+    }
+
+    [Fact]
+    public void Parse_LogInsideReplica_Throws()
+    {
+        Assert.Throws<ArgumentException>(() => SyncOptions.Parse(new[] { "src", "replica", "10", Path.Combine("replica", "sync.log") }));
+    }
 }
