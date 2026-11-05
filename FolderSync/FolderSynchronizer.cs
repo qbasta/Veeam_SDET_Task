@@ -39,6 +39,12 @@ public class FolderSynchronizer
         {
             string replicaSubDir = Path.Combine(replicaDir, Path.GetFileName(sourceSubDir));
 
+            // a file with the same name as the source folder has to go first
+            if (File.Exists(replicaSubDir))
+            {
+                DeleteFile(replicaSubDir);
+            }
+
             if (!Directory.Exists(replicaSubDir))
             {
                 Directory.CreateDirectory(replicaSubDir);
@@ -51,6 +57,12 @@ public class FolderSynchronizer
         foreach (string sourceFile in Directory.GetFiles(sourceDir))
         {
             string replicaFile = Path.Combine(replicaDir, Path.GetFileName(sourceFile));
+
+            // same here, but the other way around
+            if (Directory.Exists(replicaFile))
+            {
+                DeleteDirectory(replicaFile);
+            }
 
             if (!File.Exists(replicaFile))
             {

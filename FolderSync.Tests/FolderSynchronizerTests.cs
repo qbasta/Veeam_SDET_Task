@@ -127,6 +127,28 @@ public class FolderSynchronizerTests : IDisposable
     }
     
     [Fact]
+    public void Sync_FileInReplicaHasTheSameNameAsFolderInSource()
+    {
+        CreateFile(_source, Path.Combine("item", "inner.txt"), "inner");
+        CreateFile(_replica, "item", "I am a file");
+
+        _synchronizer.Sync();
+
+        AssertReplicaMatchesSource();
+    }
+
+    [Fact]
+    public void Sync_FolderInReplicaHasTheSameNameAsFileInSource()
+    {
+        CreateFile(_source, "item", "I am a file");
+        CreateFile(_replica, Path.Combine("item", "inner.txt"), "inner");
+
+        _synchronizer.Sync();
+
+        AssertReplicaMatchesSource();
+    }
+    
+    [Fact]
     public void Sync_SourceDoesNotExist_Throws()
     {
         Directory.Delete(_source);
