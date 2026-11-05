@@ -103,6 +103,30 @@ public class FolderSynchronizerTests : IDisposable
     }
     
     [Fact]
+    public void Sync_UpdatesFileWhenContentChangedButSizeIsTheSame()
+    {
+        CreateFile(_source, "a.txt", "aaaa");
+        _synchronizer.Sync();
+
+        CreateFile(_source, "a.txt", "bbbb");
+        _synchronizer.Sync();
+
+        AssertReplicaMatchesSource();
+    }
+
+    [Fact]
+    public void Sync_NothingChanged_DoesNotLogAnything()
+    {
+        CreateFile(_source, "a.txt", "a");
+        _synchronizer.Sync();
+        int linesAfterFirstSync = File.ReadAllLines(_logPath).Length;
+
+        _synchronizer.Sync();
+
+        Assert.Equal(linesAfterFirstSync, File.ReadAllLines(_logPath).Length);
+    }
+    
+    [Fact]
     public void Sync_SourceDoesNotExist_Throws()
     {
         Directory.Delete(_source);

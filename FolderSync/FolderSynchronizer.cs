@@ -1,4 +1,6 @@
-﻿namespace FolderSync;
+﻿using System.Security.Cryptography;
+
+namespace FolderSync;
 
 public class FolderSynchronizer
 {
@@ -55,12 +57,29 @@ public class FolderSynchronizer
                 File.Copy(sourceFile, replicaFile);
                 _logger.Log($"Copied file: {sourceFile} -> {replicaFile}");
             }
-            else if (new FileInfo(sourceFile).Length != new FileInfo(replicaFile).Length)
+            else if (!FilesAreEqual(sourceFile, replicaFile))
             {
                 File.Copy(sourceFile, replicaFile, true);
                 _logger.Log($"Updated file: {sourceFile} -> {replicaFile}");
             }
         }
+    }
+    
+    private static bool FilesAreEqual(string firstPath, string secondPath)
+    {
+        // different size means different content, no need to calculate hashes
+        if (new FileInfo(firstPath).Length != new FileInfo(secondPath).Length)
+        {
+            return false;
+        }
+
+        return CalculateSha256(firstPath).SequenceEqual(CalculateSha256(secondPath));
+    }
+
+    private static byte[] CalculateSha256(string path)
+    {
+        using FileStream stream = File.OpenRead(path);
+        return SHA256.HashData(stream);
     }
 
     // Deletes everything from the replica folder that is not in the source folder
