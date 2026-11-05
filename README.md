@@ -37,7 +37,8 @@ Every create / copy / update / delete is written to the console and to the log f
 If a run fails (for example the source folder is gone) the error is logged and the next run tries again.
 
 The program does not start if source and replica are the same or nested in each other,
-or if the log file is inside the replica folder (it would be deleted).
+or if the log file is inside the source or the replica folder
+(it would be copied on every run, or deleted from the replica).
 
 ## Tests
 
@@ -46,10 +47,3 @@ dotnet test
 ```
 
 Tests use xUnit and temporary folders.
-
-## Possible improvements
-
-- Handle errors per file (skip a locked file instead of failing the whole run).
-- Compare last write time before calculating hashes to avoid reading big files.
-- Copy to a temporary file and move it, so the replica never contains a half-copied file.
-- Handle symbolic links.
