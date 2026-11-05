@@ -62,4 +62,10 @@ public class SyncOptionsTests
     {
         Assert.Throws<ArgumentException>(() => SyncOptions.Parse(new[] { "src", "replica", "10", Path.Combine("replica", "sync.log") }));
     }
+
+	[Fact]
+    public void Parse_LogInsideSource_Throws()
+	{
+		Assert.Throws<ArgumentException>(() => SyncOptions.Parse(new[] { "src", "replica", "10", Path.Combine("src", "sync.log") }));
+	}
 }

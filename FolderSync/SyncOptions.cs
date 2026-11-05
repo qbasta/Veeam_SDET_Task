@@ -29,6 +29,12 @@ public class SyncOptions
             throw new ArgumentException("Source and replica folders cannot be the same or nested in each other.");
         }
 
+        // the log file would be copied to the replica and changed by every run
+        if (IsInside(log, source))
+        {
+            throw new ArgumentException("Log file cannot be placed inside the source folder.");
+        }
+
         // the log file would be deleted as a file that does not exist in source
         if (IsInside(log, replica))
         {
